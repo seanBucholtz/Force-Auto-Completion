@@ -1,25 +1,26 @@
 {
   "manifest_version": 2,
 
-  "name": "Force Auto-Complete",
+  "name": "AutoFill-Me",
   "description": "This extension allows the user to change the autocomplete property of a form field",
   "version": "1.0",
 
   "permissions": [
     "contextMenus",
-    "tabs"
+    "tabs",
+    "storage"
   ],
   "background": {
-    "persistent": false,
-    "scripts": ["background.js"]
+    "persistent": true,
+    "scripts": ["js/jquery-3.2.1.slim.min.js", "js/background.js"]
   },
   "content_scripts": [{
     "matches": ["<all_urls>"],
-    "js": ["content.js"],
+    "js": ["js/jquery-3.2.1.slim.min.js", "js/content.js"],
     "run_at": "document_start",
     "all_frames": true
   }],
   "icons": {
-    "128": "icon.png"
+    "128": "img/icon.png"
   }
 }

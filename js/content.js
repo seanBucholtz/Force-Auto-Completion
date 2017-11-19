@@ -1,4 +1,5 @@
 var lastClicked = null;
+var pageURL = null;
 
 var mouseClickProxy = document.createElement('script');
 mouseClickProxy.id = 'mouseClickProxyID';
@@ -21,8 +22,9 @@ document.documentElement.appendChild(mouseClickProxy);
 var lastElementClickedListener = new MutationObserver(function(mutations) {
     mutations.forEach(function(mutation) {
         if((mutation.type === 'attributes') && (mutation.attributeName === 'data-element-clicked')) {
+            console.log("Overwriting last clicked..");
             lastClicked = mouseClickProxy.dataset.elementClicked;
-            console.log('lastClicked = ' + lastClicked);
+            console.log('Mouse event lastClicked = ' + lastClicked);
         }
     });
 });
@@ -34,33 +36,30 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         sendResponse(lastClicked);
     }
     if(request === "enable") {
-        // sendResponse(lastClicked);
         console.log("enabling auto-complete on: " + lastClicked);
         enableAutoComplete(lastClicked);
+//        console.log("Saving " + lastClicked + " under URL " + pageURL);
+        sendResponse({"URL": pageURL, "ID": lastClicked});
     }
 }, false);
 
 
 function enableAutoComplete(elementID) {
+    debugger;
     console.log('elementID: ' + elementID);
     if(elementID === undefined || elementID === null) {
         console.log('ID is null: unable to enable auto-complete on this element');
         return false;
     }
-    var inputElement = document.getElementById(elementID);
+    var inputElement = $('#' + elementID);
     if(hasAutoCompleteDisabled(inputElement)) {
-        // inputElement.removeAttribute("autocomplete");
         inputElement.setAttribute("autocomplete", "on")
-        // var script = 'inputElement.removeAttribute("autocomplete");';
-        // chrome.tabs.executeScript({
-        //     code: script
-        // });
     }
 }
 
 function hasAutoCompleteDisabled(element) {
-    var autoComplete = element.getAttribute("autocomplete");
-    if(autoComplete === null) {
+    var autoComplete = $(element).attr("autocomplete");
+    if(!autoComplete) {
         return false;
     }
     else if(autoComplete === "off") {
@@ -70,3 +69,8 @@ function hasAutoCompleteDisabled(element) {
         return false;
     }
 }
+
+$(document).ready(function() {
+    pageURL = window.location.href;
+});
+
